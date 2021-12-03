@@ -4,10 +4,10 @@ var dotenv = require('dotenv');
 var mongo = require('mongodb');
 var MongoClient = mongo.MongoClient;
 dotenv.config();
-var mongoUrl = 'mongodb+srv://local:testuser@cluster0.f8vmc.mongodb.net/augintern?retryWrites=true&w=majority';
+var mongoUrl = 'mongodb://testuser:userpass@cluster0-shard-00-00.tu5oi.mongodb.net:27017,cluster0-shard-00-01.tu5oi.mongodb.net:27017,cluster0-shard-00-02.tu5oi.mongodb.net:27017/edureka?ssl=true&replicaSet=atlas-86s3em-shard-0&authSource=admin&retryWrites=true&w=majority';
 var cors = require('cors')
 const bodyParser = require('body-parser')
-var port = process.env.PORT || 8127;
+var port = process.env.PORT || 8124;
 // save the database connection
 var db;
 
@@ -22,7 +22,7 @@ app.get('/',(req,res) => {
 
 // return all the city
 app.get('/location',(req,res) => {
-    db.collection('location').find().toArray((err,result) => {
+    db.collection('location').find({},{projection: { _id: 0 }}).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -30,7 +30,7 @@ app.get('/location',(req,res) => {
 
 // return all the mealType
 app.get('/mealType',(req,res) => {
-    db.collection('mealType').find().toArray((err,result) => {
+    db.collection('Mealtypes').find().toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -48,7 +48,7 @@ app.get('/restaurants',(req,res) => {
 // restaurant wrt to id
 app.get('/restaurant/:id',(req,res) => {
     var id = parseInt(req.params.id);
-    db.collection('restaurants').find({"restaurant_id":id}).toArray((err,result) =>{
+    db.collection('restaurant').find({"restaurant_id":id}).toArray((err,result) =>{
         if(err) throw err;
         res.send(result) 
     })
@@ -61,7 +61,7 @@ app.get('/restaurants',(req,res) => {
     if(req.query.city){
         query={state_id:Number(req.query.city)}
     }
-    db.collection('restaurants').find(query).toArray((err,result) => {
+    db.collection('restaurant').find(query).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -103,7 +103,7 @@ app.get('/filter/:mealId',(req,res) => {
         query = {$and:[{cost:{$gt:lcost,$lt:hcost}}],"mealTypes.mealtype_id":id}
     }
 
-    db.collection('restaurants').find(query).sort(sort).skip(skip).limit(limit).toArray((err,result) =>{
+    db.collection('restaurant').find(query).sort(sort).skip(skip).limit(limit).toArray((err,result) =>{
         if(err) throw err;
         res.send(result) 
     })
@@ -112,7 +112,7 @@ app.get('/filter/:mealId',(req,res) => {
 // return all the menu
 app.get('/menu/:restid',(req,res) => {
     var restid = Number(req.params.restid)
-    db.collection('menu').find({restaurant_id:restid}).toArray((err,result) => {
+    db.collection('RestaurantMenu').find({restaurant_id:restid}).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -120,7 +120,7 @@ app.get('/menu/:restid',(req,res) => {
 
 app.post('/menuItem',(req,res) => {
     console.log(req.body);
-    db.collection('menu').find({menu_id:{$in:req.body}}).toArray((err,result) => {
+    db.collection('RestaurantMenu').find({menu_id:{$in:req.body}}).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -130,7 +130,7 @@ app.post('/menuItem',(req,res) => {
 app.put('/updateStatus/:id',(req,res) => {
     var id = Number(req.params.id);
     var status = req.body.status?req.body.status:"Pending"
-    db.collection('orders').updateOne(
+    db.collection('order').updateOne(
         {id:id},
         {
             $set:{
@@ -146,7 +146,7 @@ app.put('/updateStatus/:id',(req,res) => {
 
 // return all the orders
 app.get('/orders',(req,res) => {
-    db.collection('orders').find().toArray((err,result) => {
+    db.collection('order').find().toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -154,14 +154,14 @@ app.get('/orders',(req,res) => {
 
 app.post('/placeOrder',(req,res) => {
     console.log(req.body);
-    db.collection('orders').insert(req.body,(err,result)=>{
+    db.collection('order').insert(req.body,(err,result)=>{
         if(err) throw err;
         res.send("order placed")
     })
 })
 
-app.delete('/deletOrders',(req,res)=>{
-    db.collection('orders').remove({},(err,result) => {
+app.delete('/deleteOrders',(req,res)=>{
+    db.collection('order').remove({},(err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -171,7 +171,7 @@ app.delete('/deletOrders',(req,res)=>{
 // connecting with mongodb
 MongoClient.connect(mongoUrl, (err,client) => {
     if(err) console.log("Error While Connecting");
-    db = client.db('augintern');
+    db = client.db('edureka');
     app.listen(port,()=>{
         console.log(`listening on port ${port}`)
     })
