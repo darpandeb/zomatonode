@@ -112,7 +112,7 @@ app.get('/filter/:mealId',(req,res) => {
 // return all the menu
 app.get('/menu/:restid',(req,res) => {
     var restid = Number(req.params.restid)
-    db.collection('RestaurantMenu').find({restaurant_id:restid}).toArray((err,result) => {
+    db.collection('RestuarantMenu').find({restaurant_id:restid}).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
@@ -120,7 +120,7 @@ app.get('/menu/:restid',(req,res) => {
 
 app.post('/menuItem',(req,res) => {
     console.log(req.body);
-    db.collection('RestaurantMenu').find({menu_id:{$in:req.body}}).toArray((err,result) => {
+    db.collection('RestuarantMenu').find({menu_id:{$in:req.body}}).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
