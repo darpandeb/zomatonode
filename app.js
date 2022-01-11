@@ -134,7 +134,6 @@ app.put('/updateStatus/:id',(req,res) => {
         {id:id},
         {
             $set:{
-                "date":req.body.date,
                 "bank_status":req.body.bank_status,
                 "bank":req.body.bank,
                 "status":status
