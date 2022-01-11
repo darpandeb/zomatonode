@@ -133,7 +133,7 @@ app.put('/updateStatus/:id',(req,res) => {
     db.collection('order').updateOne(
         {id:id},
         {
-            $set:{
+            $set:{   
     
                 "bank_status":req.body.bank_status,
                 "bank":req.body.bank,
