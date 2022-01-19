@@ -4,7 +4,7 @@ var dotenv = require('dotenv');
 var mongo = require('mongodb');
 var MongoClient = mongo.MongoClient;
 dotenv.config();
-var mongoUrl = 'mongodb://testuser:userpass@cluster0-shard-00-00.tu5oi.mongodb.net:27017,cluster0-shard-00-01.tu5oi.mongodb.net:27017,cluster0-shard-00-02.tu5oi.mongodb.net:27017/edureka?ssl=true&replicaSet=atlas-86s3em-shard-0&authSource=admin&retryWrites=true&w=majority';
+var mongoUrl = "mongodb://testuser:userpass@cluster0-shard-00-00.tu5oi.mongodb.net:27017,cluster0-shard-00-01.tu5oi.mongodb.net:27017,cluster0-shard-00-02.tu5oi.mongodb.net:27017/edureka?ssl=true&replicaSet=atlas-86s3em-shard-0&authSource=admin&retryWrites=true&w=majority";
 var cors = require('cors')
 const bodyParser = require('body-parser')
 var port = process.env.PORT || 8124;
@@ -151,6 +151,20 @@ app.get('/orders',(req,res) => {
         res.send(result)
     })
 })
+
+// return orders based on email address
+app.get('/orders',(req,res) => {
+    query={}
+    if(req.query.email){
+        query={email:req.query.email}
+        db.collection('order').find(query).toArray((err,result) => {
+            if(err) throw err;
+            res.send(result)
+        })
+    }
+    
+})
+
 
 app.post('/placeOrder',(req,res) => {
     console.log(req.body);
