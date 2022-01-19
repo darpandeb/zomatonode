@@ -152,7 +152,7 @@ app.get('/orders',(req,res) => {
     })
 })
 
-// return orders based on email address
+// return orders based on email 
 app.get('/orders',(req,res) => {
     query={}
     if(req.query.email){
